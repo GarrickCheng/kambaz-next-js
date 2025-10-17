@@ -1,16 +1,23 @@
 "use client";
 import { useParams } from "next/navigation";
 import { BsCalendar3 } from "react-icons/bs";
+import Link from "next/link";
+import * as db from "../../../../Database";
+
+interface Assignment {
+  _id: string;
+  title: string;
+  course: string;
+  description: string;
+  points: number;
+  dueDate: string;
+  availableDate: string;
+}
 
 export default function AssignmentEditor() {
-    const assignments: Record<number, string> = {
-        123: "A1",
-        2: "A2", 
-        3: "A3"
-    };
-
-    const { aid } = useParams<{ aid: string }>();
-    const assignmentName = assignments[Number(aid)] || "A1";
+    const { cid, aid } = useParams<{ cid: string; aid: string }>();
+    const assignments = db.assignments;
+    const assignment = assignments.find((assignment: Assignment) => assignment._id === aid);
 
   return (
     <div id="wd-assignments-editor" className="container-fluid px-4 py-3">
@@ -22,27 +29,17 @@ export default function AssignmentEditor() {
         <input
           id="wd-name"
           className="form-control"
-          defaultValue={assignmentName}
+          defaultValue={assignment?.title || "New Assignment"}
         />
       </div>
 
       <div className="mb-4">
+        <label htmlFor="wd-description" className="form-label fw-bold">
+          Description
+        </label>
         <div className="border rounded p-3" style={{ backgroundColor: "#f8f9fa" }}>
-          <p className="mb-2">
-            The assignment is <span className="text-success fw-bold">available online</span>
-          </p>
-          <p className="mb-2">
-            Submit a link to the landing page of your Web application running on Netlify.
-          </p>
-          <p className="mb-2">The landing page should include the following:</p>
-          <ul className="mb-2">
-            <li>Your full name and section</li>
-            <li>Links to each of the lab assignments</li>
-            <li>Link to the Kanbas application</li>
-            <li>Links to all relevant source code repositories</li>
-          </ul>
           <p className="mb-0">
-            The Kanbas application should include a link to navigate back to the landing page.
+            {assignment?.description || "No description available."}
           </p>
         </div>
       </div>
@@ -56,7 +53,7 @@ export default function AssignmentEditor() {
             id="wd-points"
             className="form-control"
             type="number"
-            defaultValue={100}
+            defaultValue={assignment?.points || 100}
           />
         </div>
       </div>
@@ -162,7 +159,7 @@ export default function AssignmentEditor() {
                   id="wd-due-date" 
                   className="form-control" 
                   type="datetime-local" 
-                  defaultValue="2024-05-13T23:59" 
+                  defaultValue={assignment?.dueDate ? `${assignment.dueDate}T23:59` : "2024-05-13T23:59"} 
                 />
                 <span className="input-group-text">
                   <i className="fas fa-calendar-alt"></i>
@@ -180,7 +177,7 @@ export default function AssignmentEditor() {
                     id="wd-available-from" 
                     className="form-control" 
                     type="datetime-local" 
-                    defaultValue="2024-05-06T12:00" 
+                    defaultValue={assignment?.availableDate ? `${assignment.availableDate}T12:00` : "2024-05-06T12:00"} 
                     style={{ minWidth: "200px" }}
                   />
                   <span className="input-group-text">
@@ -211,8 +208,8 @@ export default function AssignmentEditor() {
       </div>
 
       <div className="mt-4 d-flex justify-content-end">
-        <button id="wd-cancel" className="btn btn-secondary me-2">Cancel</button>
-        <button id="wd-save" className="btn btn-danger">Save</button>
+        <Link href={`/Courses/${cid}/Assignments`} id="wd-cancel" className="btn btn-secondary me-2">Cancel</Link>
+        <Link href={`/Courses/${cid}/Assignments`} id="wd-save" className="btn btn-danger">Save</Link>
       </div>
     </div>
   );

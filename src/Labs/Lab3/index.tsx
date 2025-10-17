@@ -1,9 +1,14 @@
+import BooleanVariables from "./BooleanVariables";
+import VariableTypes from "./VariableTypes";
+import VariablesAndConstants from "./VariablesAndConstants";
+
 export default function Lab3() {
-    return (
-      <div>
-        <h2>Lab 3</h2>
-      </div>
-    );
-  }
-  
-  
+  return(
+    <div id="wd-lab3">
+      <h2>Lab 3 - JavaScript</h2>
+      <VariablesAndConstants/>
+      <VariableTypes/>
+      <BooleanVariables/>
+    </div>
+  );
+}
