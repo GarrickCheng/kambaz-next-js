@@ -29,6 +29,7 @@ import Square from "./Square";
 import Highlight from "./Highlight";
 import PathParameters from "./PathParameters";
 import TodoList from "./todos/TodoList";
+import TernaryOperator from "./TernaryOperator";
 export default function Lab3() {
   console.log('Hello World!');
   return(
@@ -37,6 +38,7 @@ export default function Lab3() {
       <VariablesAndConstants/>
       <VariableTypes/>
       <BooleanVariables/>
+      <TernaryOperator/>
       <IfElse/>
       <ConditionalOutputIfElse/>
       <ConditionalOutputInline/>
