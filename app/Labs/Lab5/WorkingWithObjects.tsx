@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_BASE;
@@ -21,10 +21,10 @@ function WorkingWithObjects() {
     course: "Web Development",
   });
 
-  const fetchAssignment = async () => {
+  const fetchAssignment = useCallback(async () => {
     const response = await axios.get(`${ASSIGNMENT_URL}`);
     setAssignment(response.data);
-  };
+  }, [ASSIGNMENT_URL]);
   const updateTitle = async () => {
     const response = await axios
       .get(`${ASSIGNMENT_URL}/title/${assignment.title}`);
@@ -32,7 +32,7 @@ function WorkingWithObjects() {
   };
   useEffect(() => {
     fetchAssignment();
-  }, []);
+  }, [fetchAssignment]);
 
   return (
     <div>

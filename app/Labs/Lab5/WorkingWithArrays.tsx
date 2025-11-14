@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import axios, { AxiosError } from "axios";
 
 interface Todo {
   id: number;
@@ -12,7 +12,7 @@ interface Todo {
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 function WorkingWithArrays() {
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const API = `${API_BASE}/a5/todos`;
   const [todo, setTodo] = useState({
     id: 1,
@@ -22,10 +22,10 @@ function WorkingWithArrays() {
     completed: false,
   });
   const [todos, setTodos] = useState<Todo[]>([]);
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     const response = await axios.get(API);
     setTodos(response.data);
-  };
+  }, [API]);
   const postTodo = async () => {
     const response = await axios.post(API, todo);
     setTodos([...todos, response.data]);
@@ -48,26 +48,30 @@ function WorkingWithArrays() {
   };
   const deleteTodo = async (todo: Todo) => {
     try {
-      const response = await axios.delete(`${API}/${todo.id}`);
+      await axios.delete(`${API}/${todo.id}`);
       setTodos(todos.filter((t) => t.id !== todo.id));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      setErrorMessage(error.response.data.message);
+      if (error instanceof AxiosError && error.response) {
+        setErrorMessage(error.response.data.message);
+      }
     }
   };
   const updateTodo = async () => {
     try {
-      const response = await axios.put(`${API}/${todo.id}`, todo);
+      await axios.put(`${API}/${todo.id}`, todo);
       setTodos(todos.map((t) => (t.id === todo.id ? todo : t)));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      setErrorMessage(error.response.data.message);
+      if (error instanceof AxiosError && error.response) {
+        setErrorMessage(error.response.data.message);
+      }
     }
   };
 
   useEffect(() => {
     fetchTodos();
-  }, []);
+  }, [fetchTodos]);
 
   return (
     <div>
