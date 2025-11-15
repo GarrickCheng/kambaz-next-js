@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER || "https://kambaz-node-server-app-dli0.onrender.com";
 
 function EncodingParametersInURLs() {
   const [a, setA] = useState(34);

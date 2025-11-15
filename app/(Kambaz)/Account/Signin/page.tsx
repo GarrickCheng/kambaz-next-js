@@ -7,7 +7,7 @@ import { useState } from "react";
 import axios from "axios";
 import { FormControl, Button } from "react-bootstrap";
 
-const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER || "https://kambaz-node-server-app-dli0.onrender.com";
 
 interface Credentials {
   username?: string;

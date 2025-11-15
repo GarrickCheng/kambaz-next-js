@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER || "https://kambaz-node-server-app-dli0.onrender.com";
 function WorkingWithObjects() {
 
   const [assignment, setAssignment] = useState({

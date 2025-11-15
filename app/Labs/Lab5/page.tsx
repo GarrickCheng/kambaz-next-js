@@ -3,7 +3,7 @@ import EncodingParametersInURLs from "./EncodingParametersInURLs";
 import WorkingWithArrays from "./WorkingWithArrays";
 import WorkingWithObjects from "./WorkingWithObjects";
 
-const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER;
+const API_BASE = process.env.NEXT_PUBLIC_REMOTE_SERVER || "https://kambaz-node-server-app-dli0.onrender.com";
 
 function Lab5() {
     return (
