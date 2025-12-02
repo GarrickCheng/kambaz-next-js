@@ -27,7 +27,18 @@ interface Enrollment {
   course: string;
 }
 
-export default function PeopleTable({ users = [], fetchUsers = () => {} }: { users?: Record<string, unknown>[]; fetchUsers?: () => void }) {
+interface PeopleTableUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  loginId: string;
+  section: string;
+  role: string;
+  lastActivity: string;
+  totalActivity: string;
+}
+
+export default function PeopleTable({ users = [], fetchUsers = () => {} }: { users?: PeopleTableUser[]; fetchUsers?: () => void }) {
     const { cid } = useParams();
     const { users: dbUsers, enrollments } = db;
     const [showDetails, setShowDetails] = useState(false);
@@ -61,7 +72,7 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: { use
                                 enrollment.user === user._id && enrollment.course === cid
                             )
                         ))
-                        .map((user: Record<string, unknown>) => (
+                        .map((user: PeopleTableUser) => (
                             <tr key={user._id}>
                                 <td className="wd-full-name text-nowrap">
                                     <FaUserCircle className="me-2 fs-1 text-secondary" />

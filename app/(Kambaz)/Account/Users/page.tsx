@@ -1,10 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
 import PeopleTable from "../../Courses/[cid]/People/Table/page";
 import * as client from "../client";
+
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  role: string;
+  loginId: string;
+  section: string;
+  lastActivity: string;
+  totalActivity: string;
+}
+
 export default function Users() {
-  const [users, setUsers] = useState<Record<string, unknown>[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const createUser = async () => {
@@ -43,7 +56,6 @@ export default function Users() {
   };
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div>
