@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import { Table } from "react-bootstrap";
 import * as db from "../../../../Database";
+import PeopleDetails from "../Details/page";
 
 interface User {
   _id: string;
@@ -26,12 +27,33 @@ interface Enrollment {
   course: string;
 }
 
-export default function PeopleTable() {
+interface PeopleTableUser {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  loginId: string;
+  section: string;
+  role: string;
+  lastActivity: string;
+  totalActivity: string;
+}
+
+export default function PeopleTable({ users = [], fetchUsers = () => {} }: { users?: PeopleTableUser[]; fetchUsers?: () => void }) {
     const { cid } = useParams();
-    const { users, enrollments } = db;
+    const { users: dbUsers, enrollments } = db;
+    const [showDetails, setShowDetails] = useState(false);
+    const [showUserId, setShowUserId] = useState<string | null>(null);
     
     return (
         <div id="wd-people-table">
+            {showDetails && (
+                <PeopleDetails
+                    uid={showUserId}
+                    onClose={() => {
+                        setShowDetails(false);
+                        fetchUsers();
+                    }} />
+            )}
             <Table striped>
                 <thead>
                     <tr>
@@ -44,17 +66,23 @@ export default function PeopleTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {users
+                    {(users.length > 0 ? users : dbUsers
                         .filter((user: User) => 
                             enrollments.some((enrollment: Enrollment) => 
                                 enrollment.user === user._id && enrollment.course === cid
                             )
-                        )
-                        .map((user: User) => (
+                        ))
+                        .map((user: PeopleTableUser) => (
                             <tr key={user._id}>
                                 <td className="wd-full-name text-nowrap">
                                     <FaUserCircle className="me-2 fs-1 text-secondary" />
-                                    <span className="wd-first-name">{user.firstName}</span>{" "}
+                                    <span className="wd-first-name text-decoration-none"
+                                        onClick={() => {
+                                            setShowDetails(true);
+                                            setShowUserId(user._id);
+                                        }}>
+                                        {user.firstName}
+                                    </span>{" "}
                                     <span className="wd-last-name">{user.lastName}</span>
                                 </td>
                                 <td className="wd-login-id">{user.loginId}</td>

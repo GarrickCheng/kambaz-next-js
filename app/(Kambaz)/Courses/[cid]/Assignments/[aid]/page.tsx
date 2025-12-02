@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../../store";
 import { addAssignment, updateAssignment } from "../../../Assignments/reducer";
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import * as coursesClient from "../../../client";
 
 interface Assignment {
   _id: string;
@@ -25,7 +25,7 @@ export default function AssignmentEditor() {
     const existingAssignment = assignments.find((assignment: Assignment) => assignment._id === aid);
     
     const [assignment, setAssignment] = useState<Assignment>({
-      _id: aid || uuidv4(),
+      _id: aid || "",
       title: "New Assignment",
       course: cid as string,
       description: "New Assignment Description",
@@ -40,12 +40,28 @@ export default function AssignmentEditor() {
       }
     }, [existingAssignment]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
       if (aid === "Editor") {
         // Creating new assignment
-        dispatch(addAssignment({ ...assignment, _id: uuidv4() }));
+        const assignmentData = {
+          title: assignment.title,
+          description: assignment.description,
+          points: assignment.points,
+          dueDate: assignment.dueDate,
+          availableDate: assignment.availableDate,
+        };
+        const newAssignment = await coursesClient.createAssignment(cid as string, assignmentData);
+        dispatch(addAssignment(newAssignment));
       } else {
         // Updating existing assignment
+        const assignmentData = {
+          title: assignment.title,
+          description: assignment.description,
+          points: assignment.points,
+          dueDate: assignment.dueDate,
+          availableDate: assignment.availableDate,
+        };
+        await coursesClient.updateAssignment(aid as string, assignmentData);
         dispatch(updateAssignment(assignment));
       }
       router.push(`/Courses/${cid}/Assignments`);
