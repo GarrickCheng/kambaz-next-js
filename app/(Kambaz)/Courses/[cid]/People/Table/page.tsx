@@ -4,9 +4,7 @@ import { useParams } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import { Table } from "react-bootstrap";
 import * as db from "../../../../Database";
-import * as client from "../../../../Account/client";
 import PeopleDetails from "../Details/page";
-import Link from "next/link";
 
 interface User {
   _id: string;
@@ -29,7 +27,7 @@ interface Enrollment {
   course: string;
 }
 
-export default function PeopleTable({ users = [], fetchUsers = () => {} }: { users?: any[]; fetchUsers?: () => void }) {
+export default function PeopleTable({ users = [], fetchUsers = () => {} }: { users?: Record<string, unknown>[]; fetchUsers?: () => void }) {
     const { cid } = useParams();
     const { users: dbUsers, enrollments } = db;
     const [showDetails, setShowDetails] = useState(false);
@@ -63,7 +61,7 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: { use
                                 enrollment.user === user._id && enrollment.course === cid
                             )
                         ))
-                        .map((user: any) => (
+                        .map((user: Record<string, unknown>) => (
                             <tr key={user._id}>
                                 <td className="wd-full-name text-nowrap">
                                     <FaUserCircle className="me-2 fs-1 text-secondary" />

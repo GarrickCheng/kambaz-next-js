@@ -4,8 +4,7 @@ import { useParams } from "next/navigation";
 import PeopleTable from "../../Courses/[cid]/People/Table/page";
 import * as client from "../client";
 export default function Users() {
-  const { uid } = useParams();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<Record<string, unknown>[]>([]);
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const createUser = async () => {
@@ -44,7 +43,8 @@ export default function Users() {
   };
   useEffect(() => {
     fetchUsers();
-  }, [uid]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div>
       <h3>Users</h3>

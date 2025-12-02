@@ -2,27 +2,41 @@
 import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { FaCheck, FaPencil } from "react-icons/fa6";
-import { useParams } from "next/navigation";
-import Link from "next/link";
 import * as client from "../../../../Account/client";
+
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  loginId: string;
+  section: string;
+  totalActivity: string;
+}
+
 export default function PeopleDetails({ uid, onClose }: { uid: string | null; onClose: () => void; }) {
-  const [user, setUser] = useState<any>({});
+  const [user, setUser] = useState<User | null>(null);
+  const [name, setName] = useState("");                           // to edit the user's first and last name
+  const [editing, setEditing] = useState(false);                  // whether we are editing or not
+  
   const fetchUser = async () => {
     if (!uid) return;
     const user = await client.findUserById(uid);
     setUser(user);
   };
+  
   useEffect(() => {
     if (uid) fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
-  if (!uid) return null;
+  
   const deleteUser = async (uid: string) => {
     await client.deleteUser(uid);
     onClose();
   };
-  const [name, setName] = useState("");                           // to edit the user's first and last name
-  const [editing, setEditing] = useState(false);                  // whether we are editing or not
+  
   const saveUser = async () => {                                  // to save updates to user's name
+    if (!user) return;
     const [firstName, lastName] = name.split(" ");                // split the name into an array and get first
     const updatedUser = { ...user, firstName, lastName };         // and last and create new version of user overwriting
     await client.updateUser(updatedUser);                         // first and last. Send update to server
@@ -30,6 +44,8 @@ export default function PeopleDetails({ uid, onClose }: { uid: string | null; on
     setEditing(false);                                            // turn off editing
     onClose();                                                    // close the dialog
   };
+  
+  if (!uid || !user) return null;
   return (
     <div className="wd-people-details position-fixed top-0 end-0 bottom-0 bg-white p-4 shadow w-25">
       <button onClick={onClose} className="btn btn-light float-end">
