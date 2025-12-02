@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FaUserCircle, FaCheck, FaPencil } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa";
+import { FaCheck, FaPencil } from "react-icons/fa6";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import * as client from "../../../../../Account/client";
+import * as client from "../../../../Account/client";
 export default function PeopleDetails({ uid, onClose }: { uid: string | null; onClose: () => void; }) {
   const [user, setUser] = useState<any>({});
   const fetchUser = async () => {
