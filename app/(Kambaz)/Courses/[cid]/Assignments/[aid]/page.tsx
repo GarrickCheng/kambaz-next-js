@@ -15,6 +15,7 @@ interface Assignment {
   points: number;
   dueDate: string;
   availableDate: string;
+  [key: string]: unknown;
 }
 
 export default function AssignmentEditor() {
