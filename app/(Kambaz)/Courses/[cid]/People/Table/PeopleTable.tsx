@@ -96,3 +96,4 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: { use
         </div>
     );
 }
+

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import PeopleTable from "../../Courses/[cid]/People/Table/page";
+import PeopleTable from "../../Courses/[cid]/People/Table/PeopleTable";
 import * as client from "../client";
 
 interface User {
