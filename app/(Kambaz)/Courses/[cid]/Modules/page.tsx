@@ -37,13 +37,7 @@ export default function Modules() {
   };
   
   const onUpdateModule = async (module: Module) => {
-    const moduleData = {
-      _id: module._id,
-      name: module.name,
-      course: module.course,
-      editing: module.editing,
-    };
-    await client.updateModule(cid as string, moduleData);
+    await client.updateModule(cid as string, module);
     const newModules = modules.map((m: Module) =>
       m._id === module._id ? module : m
     );
