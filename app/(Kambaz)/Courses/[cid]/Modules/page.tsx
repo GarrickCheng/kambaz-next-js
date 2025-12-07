@@ -23,6 +23,7 @@ interface Module {
   course: string;
   lessons?: Lesson[];
   editing?: boolean;
+  [key: string]: unknown;
 }
 
 export default function Modules() {
