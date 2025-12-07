@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import { Table } from "react-bootstrap";
 import * as db from "../../../../Database";
-import PeopleDetails from "../Details/page";
+import PeopleDetails from "../Details/PeopleDetails";
 
 interface User {
   _id: string;
