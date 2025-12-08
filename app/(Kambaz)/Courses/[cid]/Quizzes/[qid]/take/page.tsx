@@ -27,7 +27,7 @@ interface Quiz {
 
 interface Answer {
   questionId: string;
-  answer: string | boolean | null;
+  answer: string | boolean;
 }
 
 export default function QuizTake() {
@@ -66,20 +66,15 @@ export default function QuizTake() {
       const quizData = await quizzesClient.findQuizById(qid as string);
       setQuiz(quizData);
       
-      // Check if quiz has questions
-      if (!quizData.questions || quizData.questions.length === 0) {
-        return; // Don't start attempt if no questions
-      }
-      
       // Start attempt
       const attempt = await quizzesClient.startAttempt(qid as string);
       setAttemptId(attempt._id);
       
-      // Initialize answers array with proper types
+      // Initialize answers array
       setAnswers(
         quizData.questions.map((q: Question) => ({
           questionId: q._id,
-          answer: q.type === "TRUE_FALSE" ? null : "", // Use null for unanswered true/false
+          answer: "",
         }))
       );
       
@@ -154,31 +149,19 @@ export default function QuizTake() {
               <div className="p-2 mb-2 border rounded">
                 <Form.Check
                   type="radio"
-                  id={`question-${question._id}-true`}
                   label="True"
                   name={`question-${question._id}`}
-                  value="true"
                   checked={answer?.answer === true}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      handleAnswerChange(question._id, true);
-                    }
-                  }}
+                  onChange={() => handleAnswerChange(question._id, true)}
                 />
               </div>
               <div className="p-2 mb-2 border rounded">
                 <Form.Check
                   type="radio"
-                  id={`question-${question._id}-false`}
                   label="False"
                   name={`question-${question._id}`}
-                  value="false"
                   checked={answer?.answer === false}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      handleAnswerChange(question._id, false);
-                    }
-                  }}
+                  onChange={() => handleAnswerChange(question._id, false)}
                 />
               </div>
             </div>
@@ -223,13 +206,10 @@ export default function QuizTake() {
       {/* No Questions Message */}
       {(!quiz.questions || quiz.questions.length === 0) && (
         <Alert variant="warning">
-          <h5>This quiz has no questions</h5>
-          <p className="mb-0">
-            This quiz hasn't been set up yet. Please contact your instructor.
-          </p>
+          <h5>No Questions Available</h5>
+          <p>This quiz does not have any questions yet. Please contact your instructor.</p>
           <Button
             variant="secondary"
-            className="mt-3"
             onClick={() => router.push(`/Courses/${cid}/Quizzes`)}
           >
             Back to Quizzes
