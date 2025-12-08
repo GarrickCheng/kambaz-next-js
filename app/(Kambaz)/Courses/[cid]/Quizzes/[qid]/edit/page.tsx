@@ -33,6 +33,7 @@ interface Quiz {
     points: number;
     question: string;
   }>;
+  [key: string]: unknown;
 }
 
 export default function QuizEditor() {
