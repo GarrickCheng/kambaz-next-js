@@ -324,7 +324,10 @@ export default function QuizEditor() {
 
           {/* Questions Tab */}
           <Tab.Pane eventKey="questions">
-            <QuizQuestionsEditor quiz={quiz} onQuizUpdate={setQuiz} />
+            <QuizQuestionsEditor 
+              quiz={quiz} 
+              onQuizUpdate={(updatedQuiz) => setQuiz(updatedQuiz as Quiz)} 
+            />
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>
