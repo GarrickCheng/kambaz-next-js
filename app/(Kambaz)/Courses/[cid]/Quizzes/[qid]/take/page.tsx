@@ -27,7 +27,7 @@ interface Quiz {
 
 interface Answer {
   questionId: string;
-  answer: string | boolean;
+  answer: string | boolean | null;
 }
 
 export default function QuizTake() {
@@ -66,15 +66,20 @@ export default function QuizTake() {
       const quizData = await quizzesClient.findQuizById(qid as string);
       setQuiz(quizData);
       
+      // Check if quiz has questions
+      if (!quizData.questions || quizData.questions.length === 0) {
+        return; // Don't start attempt if no questions
+      }
+      
       // Start attempt
       const attempt = await quizzesClient.startAttempt(qid as string);
       setAttemptId(attempt._id);
       
-      // Initialize answers array
+      // Initialize answers array with proper types
       setAnswers(
         quizData.questions.map((q: Question) => ({
           questionId: q._id,
-          answer: "",
+          answer: q.type === "TRUE_FALSE" ? null : "", // Use null for unanswered true/false
         }))
       );
       
@@ -149,6 +154,7 @@ export default function QuizTake() {
               <div className="p-2 mb-2 border rounded">
                 <Form.Check
                   type="radio"
+                  id={`question-${question._id}-true`}
                   label="True"
                   name={`question-${question._id}`}
                   checked={answer?.answer === true}
@@ -158,6 +164,7 @@ export default function QuizTake() {
               <div className="p-2 mb-2 border rounded">
                 <Form.Check
                   type="radio"
+                  id={`question-${question._id}-false`}
                   label="False"
                   name={`question-${question._id}`}
                   checked={answer?.answer === false}
@@ -203,41 +210,60 @@ export default function QuizTake() {
         </div>
       )}
 
+      {/* No Questions Message */}
+      {(!quiz.questions || quiz.questions.length === 0) && (
+        <Alert variant="warning">
+          <h5>This quiz has no questions</h5>
+          <p className="mb-0">
+            This quiz hasn't been set up yet. Please contact your instructor.
+          </p>
+          <Button
+            variant="secondary"
+            className="mt-3"
+            onClick={() => router.push(`/Courses/${cid}/Quizzes`)}
+          >
+            Back to Quizzes
+          </Button>
+        </Alert>
+      )}
+
       {/* Questions */}
-      {quiz.oneQuestionAtATime ? (
-        <div>
-          {renderQuestion(quiz.questions[currentQuestionIndex], currentQuestionIndex)}
-          <div className="d-flex justify-content-between mt-4">
-            <Button
-              variant="secondary"
-              disabled={currentQuestionIndex === 0}
-              onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
-            >
-              Previous
-            </Button>
-            {currentQuestionIndex < quiz.questions.length - 1 ? (
+      {quiz.questions && quiz.questions.length > 0 && (
+        quiz.oneQuestionAtATime ? (
+          <div>
+            {quiz.questions[currentQuestionIndex] && renderQuestion(quiz.questions[currentQuestionIndex], currentQuestionIndex)}
+            <div className="d-flex justify-content-between mt-4">
               <Button
-                variant="primary"
-                onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                variant="secondary"
+                disabled={currentQuestionIndex === 0}
+                onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
               >
-                Next
+                Previous
               </Button>
-            ) : (
+              {currentQuestionIndex < quiz.questions.length - 1 ? (
+                <Button
+                  variant="primary"
+                  onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button variant="danger" onClick={handleSubmit}>
+                  Submit Quiz
+                </Button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {quiz.questions.map((question, index) => renderQuestion(question, index))}
+            <div className="d-flex justify-content-end mt-4">
               <Button variant="danger" onClick={handleSubmit}>
                 Submit Quiz
               </Button>
-            )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div>
-          {quiz.questions.map((question, index) => renderQuestion(question, index))}
-          <div className="d-flex justify-content-end mt-4">
-            <Button variant="danger" onClick={handleSubmit}>
-              Submit Quiz
-            </Button>
-          </div>
-        </div>
+        )
       )}
     </div>
   );
