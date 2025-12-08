@@ -34,6 +34,7 @@ interface Props {
 
 export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<Partial<Question> | null>(null);
   const [newQuestion, setNewQuestion] = useState<Partial<Question> | null>(null);
 
   const handleAddQuestion = () => {
@@ -57,6 +58,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
         const updatedQuiz = await quizzesClient.findQuizById(quiz._id);
         onQuizUpdate(updatedQuiz);
         setEditingQuestionId(null);
+        setEditingQuestion(null);
       } else {
         // Create new question
         await quizzesClient.addQuestion(quiz._id, question);
@@ -81,17 +83,18 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
 
   const handleCancelEdit = () => {
     setEditingQuestionId(null);
+    setEditingQuestion(null);
     setNewQuestion(null);
   };
 
   const renderQuestionEditor = (question: Partial<Question>, isNew: boolean = false) => {
+    const currentQuestion = isNew ? newQuestion : editingQuestion || question;
+    
     const updateQuestion = (field: string, value: unknown) => {
       if (isNew) {
         setNewQuestion({ ...newQuestion, [field]: value });
       } else {
-        // For existing questions, we'll handle this differently
-        const updatedQuestion = { ...question, [field]: value };
-        setEditingQuestionId(question._id || null);
+        setEditingQuestion({ ...currentQuestion, [field]: value });
       }
     };
 
@@ -102,11 +105,11 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
           <Form.Group className="mb-3">
             <Form.Label>Question Type</Form.Label>
             <Form.Select
-              value={question.type}
+              value={currentQuestion.type}
               onChange={(e) => {
                 const newType = e.target.value as Question["type"];
                 const updated: Partial<Question> = {
-                  ...question,
+                  ...currentQuestion,
                   type: newType,
                 };
                 
@@ -130,6 +133,8 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                 
                 if (isNew) {
                   setNewQuestion(updated);
+                } else {
+                  setEditingQuestion(updated);
                 }
               }}
             >
@@ -144,12 +149,8 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Label>Title</Form.Label>
             <Form.Control
               type="text"
-              value={question.title || ""}
-              onChange={(e) => {
-                if (isNew) {
-                  setNewQuestion({ ...newQuestion, title: e.target.value });
-                }
-              }}
+              value={currentQuestion.title || ""}
+              onChange={(e) => updateQuestion("title", e.target.value)}
               placeholder="Question title"
             />
           </Form.Group>
@@ -160,12 +161,8 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Control
               as="textarea"
               rows={3}
-              value={question.question || ""}
-              onChange={(e) => {
-                if (isNew) {
-                  setNewQuestion({ ...newQuestion, question: e.target.value });
-                }
-              }}
+              value={currentQuestion.question || ""}
+              onChange={(e) => updateQuestion("question", e.target.value)}
               placeholder="Enter your question"
             />
           </Form.Group>
@@ -175,33 +172,27 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Label>Points</Form.Label>
             <Form.Control
               type="number"
-              value={question.points || 1}
-              onChange={(e) => {
-                if (isNew) {
-                  setNewQuestion({ ...newQuestion, points: parseInt(e.target.value) });
-                }
-              }}
+              value={currentQuestion.points || 1}
+              onChange={(e) => updateQuestion("points", parseInt(e.target.value))}
             />
           </Form.Group>
 
           {/* Type-specific fields */}
-          {question.type === "MULTIPLE_CHOICE" && (
+          {currentQuestion.type === "MULTIPLE_CHOICE" && (
             <div>
               <Form.Label>Answers</Form.Label>
-              {question.choices?.map((choice, index) => (
+              {currentQuestion.choices?.map((choice, index) => (
                 <div key={index} className="d-flex align-items-center mb-2">
                   <Form.Check
                     type="radio"
-                    name={`correct-${question._id || "new"}`}
+                    name={`correct-${currentQuestion._id || "new"}`}
                     checked={choice.isCorrect}
                     onChange={() => {
-                      if (isNew && newQuestion) {
-                        const updatedChoices = newQuestion.choices?.map((c, i) => ({
-                          ...c,
-                          isCorrect: i === index,
-                        }));
-                        setNewQuestion({ ...newQuestion, choices: updatedChoices });
-                      }
+                      const updatedChoices = currentQuestion.choices?.map((c, i) => ({
+                        ...c,
+                        isCorrect: i === index,
+                      }));
+                      updateQuestion("choices", updatedChoices);
                     }}
                     className="me-2"
                   />
@@ -209,27 +200,23 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                     type="text"
                     value={choice.text}
                     onChange={(e) => {
-                      if (isNew && newQuestion) {
-                        const updatedChoices = newQuestion.choices?.map((c, i) =>
-                          i === index ? { ...c, text: e.target.value } : c
-                        );
-                        setNewQuestion({ ...newQuestion, choices: updatedChoices });
-                      }
+                      const updatedChoices = currentQuestion.choices?.map((c, i) =>
+                        i === index ? { ...c, text: e.target.value } : c
+                      );
+                      updateQuestion("choices", updatedChoices);
                     }}
                     placeholder={`Possible Answer`}
                     className="flex-grow-1 me-2"
                   />
-                  {question.choices && question.choices.length > 2 && (
+                  {currentQuestion.choices && currentQuestion.choices.length > 2 && (
                     <Button
                       variant="link"
                       className="text-danger"
                       onClick={() => {
-                        if (isNew && newQuestion) {
-                          const updatedChoices = newQuestion.choices?.filter(
-                            (_, i) => i !== index
-                          );
-                          setNewQuestion({ ...newQuestion, choices: updatedChoices });
-                        }
+                        const updatedChoices = currentQuestion.choices?.filter(
+                          (_, i) => i !== index
+                        );
+                        updateQuestion("choices", updatedChoices);
                       }}
                     >
                       <FaTrash />
@@ -241,15 +228,10 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                 variant="link"
                 className="text-danger p-0"
                 onClick={() => {
-                  if (isNew && newQuestion) {
-                    setNewQuestion({
-                      ...newQuestion,
-                      choices: [
-                        ...(newQuestion.choices || []),
-                        { text: "", isCorrect: false },
-                      ],
-                    });
-                  }
+                  updateQuestion("choices", [
+                    ...(currentQuestion.choices || []),
+                    { text: "", isCorrect: false },
+                  ]);
                 }}
               >
                 + Add Another Answer
@@ -257,69 +239,54 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             </div>
           )}
 
-          {question.type === "TRUE_FALSE" && (
+          {currentQuestion.type === "TRUE_FALSE" && (
             <div>
               <Form.Label>Correct Answer</Form.Label>
               <div>
                 <Form.Check
                   type="radio"
                   label="True"
-                  name={`tf-${question._id || "new"}`}
-                  checked={question.correctAnswer === true}
-                  onChange={() => {
-                    if (isNew) {
-                      setNewQuestion({ ...newQuestion, correctAnswer: true });
-                    }
-                  }}
+                  name={`tf-${currentQuestion._id || "new"}`}
+                  checked={currentQuestion.correctAnswer === true}
+                  onChange={() => updateQuestion("correctAnswer", true)}
                 />
                 <Form.Check
                   type="radio"
                   label="False"
-                  name={`tf-${question._id || "new"}`}
-                  checked={question.correctAnswer === false}
-                  onChange={() => {
-                    if (isNew) {
-                      setNewQuestion({ ...newQuestion, correctAnswer: false });
-                    }
-                  }}
+                  name={`tf-${currentQuestion._id || "new"}`}
+                  checked={currentQuestion.correctAnswer === false}
+                  onChange={() => updateQuestion("correctAnswer", false)}
                 />
               </div>
             </div>
           )}
 
-          {question.type === "FILL_IN_BLANK" && (
+          {currentQuestion.type === "FILL_IN_BLANK" && (
             <div>
               <Form.Label>Possible Answers</Form.Label>
-              {question.possibleAnswers?.map((answer, index) => (
+              {currentQuestion.possibleAnswers?.map((answer, index) => (
                 <div key={index} className="d-flex align-items-center mb-2">
                   <Form.Control
                     type="text"
                     value={answer}
                     onChange={(e) => {
-                      if (isNew && newQuestion) {
-                        const updatedAnswers = newQuestion.possibleAnswers?.map((a, i) =>
-                          i === index ? e.target.value : a
-                        );
-                        setNewQuestion({ ...newQuestion, possibleAnswers: updatedAnswers });
-                      }
+                      const updatedAnswers = currentQuestion.possibleAnswers?.map((a, i) =>
+                        i === index ? e.target.value : a
+                      );
+                      updateQuestion("possibleAnswers", updatedAnswers);
                     }}
                     placeholder="Possible correct answer"
                     className="flex-grow-1 me-2"
                   />
-                  {question.possibleAnswers && question.possibleAnswers.length > 1 && (
+                  {currentQuestion.possibleAnswers && currentQuestion.possibleAnswers.length > 1 && (
                     <Button
                       variant="link"
                       className="text-danger"
                       onClick={() => {
-                        if (isNew && newQuestion) {
-                          const updatedAnswers = newQuestion.possibleAnswers?.filter(
-                            (_, i) => i !== index
-                          );
-                          setNewQuestion({
-                            ...newQuestion,
-                            possibleAnswers: updatedAnswers,
-                          });
-                        }
+                        const updatedAnswers = currentQuestion.possibleAnswers?.filter(
+                          (_, i) => i !== index
+                        );
+                        updateQuestion("possibleAnswers", updatedAnswers);
                       }}
                     >
                       <FaTrash />
@@ -331,12 +298,10 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                 variant="link"
                 className="text-danger p-0"
                 onClick={() => {
-                  if (isNew && newQuestion) {
-                    setNewQuestion({
-                      ...newQuestion,
-                      possibleAnswers: [...(newQuestion.possibleAnswers || []), ""],
-                    });
-                  }
+                  updateQuestion("possibleAnswers", [
+                    ...(currentQuestion.possibleAnswers || []),
+                    "",
+                  ]);
                 }}
               >
                 + Add Another Answer
@@ -349,7 +314,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Button variant="secondary" onClick={handleCancelEdit}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={() => handleSaveQuestion(question)}>
+            <Button variant="danger" onClick={() => handleSaveQuestion(currentQuestion)}>
               {isNew ? "Save" : "Update Question"}
             </Button>
           </div>
@@ -379,7 +344,10 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                   <div className="d-flex gap-2">
                     <Button
                       variant="link"
-                      onClick={() => setEditingQuestionId(question._id)}
+                      onClick={() => {
+                        setEditingQuestionId(question._id);
+                        setEditingQuestion(question);
+                      }}
                     >
                       Edit
                     </Button>

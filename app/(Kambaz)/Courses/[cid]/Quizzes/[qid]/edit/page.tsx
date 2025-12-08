@@ -72,7 +72,10 @@ export default function QuizEditor() {
     if (!quiz) return;
     try {
       await quizzesClient.updateQuiz(quiz._id, quiz);
-      await quizzesClient.togglePublishQuiz(quiz._id);
+      // Only toggle if quiz is currently unpublished
+      if (!quiz.published) {
+        await quizzesClient.togglePublishQuiz(quiz._id);
+      }
       router.push(`/Courses/${cid}/Quizzes`);
     } catch (error) {
       console.error("Error saving and publishing quiz:", error);
