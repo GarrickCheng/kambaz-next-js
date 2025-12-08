@@ -105,7 +105,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
           <Form.Group className="mb-3">
             <Form.Label>Question Type</Form.Label>
             <Form.Select
-              value={currentQuestion.type}
+              value={currentQuestion?.type}
               onChange={(e) => {
                 const newType = e.target.value as Question["type"];
                 const updated: Partial<Question> = {
@@ -149,7 +149,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Label>Title</Form.Label>
             <Form.Control
               type="text"
-              value={currentQuestion.title || ""}
+              value={currentQuestion?.title || ""}
               onChange={(e) => updateQuestion("title", e.target.value)}
               placeholder="Question title"
             />
@@ -161,7 +161,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Control
               as="textarea"
               rows={3}
-              value={currentQuestion.question || ""}
+              value={currentQuestion?.question || ""}
               onChange={(e) => updateQuestion("question", e.target.value)}
               placeholder="Enter your question"
             />
@@ -172,23 +172,23 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Form.Label>Points</Form.Label>
             <Form.Control
               type="number"
-              value={currentQuestion.points || 1}
+              value={currentQuestion?.points || 1}
               onChange={(e) => updateQuestion("points", parseInt(e.target.value))}
             />
           </Form.Group>
 
           {/* Type-specific fields */}
-          {currentQuestion.type === "MULTIPLE_CHOICE" && (
+          {currentQuestion?.type === "MULTIPLE_CHOICE" && (
             <div>
               <Form.Label>Answers</Form.Label>
-              {currentQuestion.choices?.map((choice, index) => (
+              {currentQuestion?.choices?.map((choice, index) => (
                 <div key={index} className="d-flex align-items-center mb-2">
                   <Form.Check
                     type="radio"
-                    name={`correct-${currentQuestion._id || "new"}`}
+                    name={`correct-${currentQuestion?._id || "new"}`}
                     checked={choice.isCorrect}
                     onChange={() => {
-                      const updatedChoices = currentQuestion.choices?.map((c, i) => ({
+                      const updatedChoices = currentQuestion?.choices?.map((c, i) => ({
                         ...c,
                         isCorrect: i === index,
                       }));
@@ -200,7 +200,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                     type="text"
                     value={choice.text}
                     onChange={(e) => {
-                      const updatedChoices = currentQuestion.choices?.map((c, i) =>
+                      const updatedChoices = currentQuestion?.choices?.map((c, i) =>
                         i === index ? { ...c, text: e.target.value } : c
                       );
                       updateQuestion("choices", updatedChoices);
@@ -208,12 +208,12 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                     placeholder={`Possible Answer`}
                     className="flex-grow-1 me-2"
                   />
-                  {currentQuestion.choices && currentQuestion.choices.length > 2 && (
+                  {currentQuestion?.choices && currentQuestion.choices.length > 2 && (
                     <Button
                       variant="link"
                       className="text-danger"
                       onClick={() => {
-                        const updatedChoices = currentQuestion.choices?.filter(
+                        const updatedChoices = currentQuestion?.choices?.filter(
                           (_, i) => i !== index
                         );
                         updateQuestion("choices", updatedChoices);
@@ -229,7 +229,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                 className="text-danger p-0"
                 onClick={() => {
                   updateQuestion("choices", [
-                    ...(currentQuestion.choices || []),
+                    ...(currentQuestion?.choices || []),
                     { text: "", isCorrect: false },
                   ]);
                 }}
@@ -239,38 +239,38 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             </div>
           )}
 
-          {currentQuestion.type === "TRUE_FALSE" && (
+          {currentQuestion?.type === "TRUE_FALSE" && (
             <div>
               <Form.Label>Correct Answer</Form.Label>
               <div>
                 <Form.Check
                   type="radio"
                   label="True"
-                  name={`tf-${currentQuestion._id || "new"}`}
-                  checked={currentQuestion.correctAnswer === true}
+                  name={`tf-${currentQuestion?._id || "new"}`}
+                  checked={currentQuestion?.correctAnswer === true}
                   onChange={() => updateQuestion("correctAnswer", true)}
                 />
                 <Form.Check
                   type="radio"
                   label="False"
-                  name={`tf-${currentQuestion._id || "new"}`}
-                  checked={currentQuestion.correctAnswer === false}
+                  name={`tf-${currentQuestion?._id || "new"}`}
+                  checked={currentQuestion?.correctAnswer === false}
                   onChange={() => updateQuestion("correctAnswer", false)}
                 />
               </div>
             </div>
           )}
 
-          {currentQuestion.type === "FILL_IN_BLANK" && (
+          {currentQuestion?.type === "FILL_IN_BLANK" && (
             <div>
               <Form.Label>Possible Answers</Form.Label>
-              {currentQuestion.possibleAnswers?.map((answer, index) => (
+              {currentQuestion?.possibleAnswers?.map((answer, index) => (
                 <div key={index} className="d-flex align-items-center mb-2">
                   <Form.Control
                     type="text"
                     value={answer}
                     onChange={(e) => {
-                      const updatedAnswers = currentQuestion.possibleAnswers?.map((a, i) =>
+                      const updatedAnswers = currentQuestion?.possibleAnswers?.map((a, i) =>
                         i === index ? e.target.value : a
                       );
                       updateQuestion("possibleAnswers", updatedAnswers);
@@ -278,12 +278,12 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                     placeholder="Possible correct answer"
                     className="flex-grow-1 me-2"
                   />
-                  {currentQuestion.possibleAnswers && currentQuestion.possibleAnswers.length > 1 && (
+                  {currentQuestion?.possibleAnswers && currentQuestion.possibleAnswers.length > 1 && (
                     <Button
                       variant="link"
                       className="text-danger"
                       onClick={() => {
-                        const updatedAnswers = currentQuestion.possibleAnswers?.filter(
+                        const updatedAnswers = currentQuestion?.possibleAnswers?.filter(
                           (_, i) => i !== index
                         );
                         updateQuestion("possibleAnswers", updatedAnswers);
@@ -299,7 +299,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
                 className="text-danger p-0"
                 onClick={() => {
                   updateQuestion("possibleAnswers", [
-                    ...(currentQuestion.possibleAnswers || []),
+                    ...(currentQuestion?.possibleAnswers || []),
                     "",
                   ]);
                 }}
@@ -314,7 +314,7 @@ export default function QuizQuestionsEditor({ quiz, onQuizUpdate }: Props) {
             <Button variant="secondary" onClick={handleCancelEdit}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={() => handleSaveQuestion(currentQuestion)}>
+            <Button variant="danger" onClick={() => currentQuestion && handleSaveQuestion(currentQuestion)}>
               {isNew ? "Save" : "Update Question"}
             </Button>
           </div>
