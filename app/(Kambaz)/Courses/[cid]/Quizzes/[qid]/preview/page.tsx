@@ -195,10 +195,16 @@ export default function QuizPreview() {
               >
                 <Form.Check
                   type="radio"
+                  id={`question-${question._id}-true`}
                   label="True"
                   name={`question-${question._id}`}
+                  value="true"
                   checked={answer?.answer === true}
-                  onChange={() => handleAnswerChange(question._id, true)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      handleAnswerChange(question._id, true);
+                    }
+                  }}
                   disabled={submitted}
                 />
               </div>
@@ -213,10 +219,16 @@ export default function QuizPreview() {
               >
                 <Form.Check
                   type="radio"
+                  id={`question-${question._id}-false`}
                   label="False"
                   name={`question-${question._id}`}
+                  value="false"
                   checked={answer?.answer === false}
-                  onChange={() => handleAnswerChange(question._id, false)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      handleAnswerChange(question._id, false);
+                    }
+                  }}
                   disabled={submitted}
                 />
               </div>
