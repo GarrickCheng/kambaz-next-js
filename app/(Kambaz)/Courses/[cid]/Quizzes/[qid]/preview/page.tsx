@@ -286,45 +286,54 @@ export default function QuizPreview() {
         </div>
       )}
 
+      {/* No Questions Message */}
+      {(!quiz.questions || quiz.questions.length === 0) && (
+        <div className="alert alert-warning">
+          This quiz has no questions yet. Please add questions in the Questions tab.
+        </div>
+      )}
+
       {/* Questions */}
-      {quiz.oneQuestionAtATime ? (
-        <div>
-          {renderQuestion(quiz.questions[currentQuestionIndex], currentQuestionIndex)}
-          <div className="d-flex justify-content-between mt-4">
-            <Button
-              variant="secondary"
-              disabled={currentQuestionIndex === 0}
-              onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
-            >
-              Previous
-            </Button>
-            {currentQuestionIndex < quiz.questions.length - 1 ? (
+      {quiz.questions && quiz.questions.length > 0 && (
+        quiz.oneQuestionAtATime ? (
+          <div>
+            {quiz.questions[currentQuestionIndex] && renderQuestion(quiz.questions[currentQuestionIndex], currentQuestionIndex)}
+            <div className="d-flex justify-content-between mt-4">
               <Button
-                variant="primary"
-                onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                variant="secondary"
+                disabled={currentQuestionIndex === 0}
+                onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
               >
-                Next
+                Previous
               </Button>
-            ) : (
-              !submitted && (
+              {currentQuestionIndex < quiz.questions.length - 1 ? (
+                <Button
+                  variant="primary"
+                  onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                >
+                  Next
+                </Button>
+              ) : (
+                !submitted && (
+                  <Button variant="danger" onClick={handleSubmit}>
+                    Submit Quiz
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {quiz.questions.map((question, index) => renderQuestion(question, index))}
+            {!submitted && (
+              <div className="d-flex justify-content-end mt-4">
                 <Button variant="danger" onClick={handleSubmit}>
                   Submit Quiz
                 </Button>
-              )
+              </div>
             )}
           </div>
-        </div>
-      ) : (
-        <div>
-          {quiz.questions.map((question, index) => renderQuestion(question, index))}
-          {!submitted && (
-            <div className="d-flex justify-content-end mt-4">
-              <Button variant="danger" onClick={handleSubmit}>
-                Submit Quiz
-              </Button>
-            </div>
-          )}
-        </div>
+        )
       )}
 
       {submitted && (
