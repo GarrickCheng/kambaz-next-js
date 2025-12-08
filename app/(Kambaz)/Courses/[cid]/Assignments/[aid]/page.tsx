@@ -15,6 +15,7 @@ interface Assignment {
   points: number;
   dueDate: string;
   availableDate: string;
+  [key: string]: unknown;
 }
 
 export default function AssignmentEditor() {
@@ -43,25 +44,11 @@ export default function AssignmentEditor() {
     const handleSave = async () => {
       if (aid === "Editor") {
         // Creating new assignment
-        const assignmentData = {
-          title: assignment.title,
-          description: assignment.description,
-          points: assignment.points,
-          dueDate: assignment.dueDate,
-          availableDate: assignment.availableDate,
-        };
-        const newAssignment = await coursesClient.createAssignment(cid as string, assignmentData);
+        const newAssignment = await coursesClient.createAssignment(cid as string, assignment);
         dispatch(addAssignment(newAssignment));
       } else {
         // Updating existing assignment
-        const assignmentData = {
-          title: assignment.title,
-          description: assignment.description,
-          points: assignment.points,
-          dueDate: assignment.dueDate,
-          availableDate: assignment.availableDate,
-        };
-        await coursesClient.updateAssignment(aid as string, assignmentData);
+        await coursesClient.updateAssignment(aid as string, assignment);
         dispatch(updateAssignment(assignment));
       }
       router.push(`/Courses/${cid}/Assignments`);

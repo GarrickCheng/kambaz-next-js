@@ -1,18 +1,18 @@
 import axios from "axios";
 const axiosWithCredentials = axios.create({ withCredentials: true });
-const REMOTE_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
+const REMOTE_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER || "http://localhost:4000";
 export const COURSES_API = `${REMOTE_SERVER}/api/courses`;
 export const USERS_API = `${REMOTE_SERVER}/api/users`;
 
 export const deleteModule = async (courseId: string, moduleId: string) => {
-  const response = await axios.delete(
+  const response = await axiosWithCredentials.delete(
     `${COURSES_API}/${courseId}/modules/${moduleId}`
   );
   return response.data;
 };
 
 export const updateModule = async (courseId: string, module: Record<string, unknown>) => {
-  const { data } = await axios.put(
+  const { data } = await axiosWithCredentials.put(
     `${COURSES_API}/${courseId}/modules/${module._id}`,
     module
   );
@@ -37,7 +37,7 @@ export const unenrollFromCourse = async (userId: string, courseId: string) => {
 
 // Get all users enrolled in a specific course
 export const findUsersForCourse = async (courseId: string) => {
-  const response = await axios.get(`${COURSES_API}/${courseId}/users`);
+  const response = await axiosWithCredentials.get(`${COURSES_API}/${courseId}/users`);
   return response.data;
 };
 
@@ -46,19 +46,19 @@ const ASSIGNMENTS_API = `${REMOTE_SERVER}/api/assignments`;
 
 // Get all assignments (across all courses)
 export const findAllAssignments = async () => {
-  const response = await axios.get(ASSIGNMENTS_API);
+  const response = await axiosWithCredentials.get(ASSIGNMENTS_API);
   return response.data;
 };
 
 // Get assignments for a specific course
 export const findAssignmentsForCourse = async (courseId: string) => {
-  const response = await axios.get(`${COURSES_API}/${courseId}/assignments`);
+  const response = await axiosWithCredentials.get(`${COURSES_API}/${courseId}/assignments`);
   return response.data;
 };
 
 // Get a single assignment by ID
 export const findAssignmentById = async (assignmentId: string) => {
-  const response = await axios.get(`${ASSIGNMENTS_API}/${assignmentId}`);
+  const response = await axiosWithCredentials.get(`${ASSIGNMENTS_API}/${assignmentId}`);
   return response.data;
 };
 

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import PeopleTable from "./Table/page";
+import PeopleTable from "./Table/PeopleTable";
 import * as coursesClient from "../../client";
 
 interface User {

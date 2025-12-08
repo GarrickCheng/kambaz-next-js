@@ -37,12 +37,14 @@ export default function PeopleDetails({ uid, onClose }: { uid: string | null; on
   
   const saveUser = async () => {                                  // to save updates to user's name
     if (!user) return;
-    const [firstName, lastName] = name.split(" ");                // split the name into an array and get first
-    const updatedUser = { ...user, firstName, lastName };         // and last and create new version of user overwriting
-    await client.updateUser(updatedUser);                         // first and last. Send update to server
+    const nameParts = name.trim().split(" ");                     // split the name into parts
+    const firstName = nameParts[0] || "";                         // first word is firstName
+    const lastName = nameParts.slice(1).join(" ") || "";          // rest is lastName
+    const updatedUser = { ...user, firstName, lastName };         // create new version of user
+    await client.updateUser(updatedUser);                         // send update to server
     setUser(updatedUser);                                         // update local copy of the user
     setEditing(false);                                            // turn off editing
-    onClose();                                                    // close the dialog
+    onClose();
   };
   
   if (!uid || !user) return null;

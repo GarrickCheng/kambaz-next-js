@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import { Table } from "react-bootstrap";
 import * as db from "../../../../Database";
-import PeopleDetails from "../Details/page";
+import PeopleDetails from "../Details/PeopleDetails";
 
 interface User {
   _id: string;
@@ -73,16 +73,15 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: { use
                             )
                         ))
                         .map((user: PeopleTableUser) => (
-                            <tr key={user._id}>
+                            <tr key={user._id}
+                                onClick={() => {
+                                    setShowDetails(true);
+                                    setShowUserId(user._id);
+                                }}
+                                style={{ cursor: 'pointer' }}>
                                 <td className="wd-full-name text-nowrap">
                                     <FaUserCircle className="me-2 fs-1 text-secondary" />
-                                    <span className="wd-first-name text-decoration-none"
-                                        onClick={() => {
-                                            setShowDetails(true);
-                                            setShowUserId(user._id);
-                                        }}>
-                                        {user.firstName}
-                                    </span>{" "}
+                                    <span className="wd-first-name">{user.firstName}</span>{" "}
                                     <span className="wd-last-name">{user.lastName}</span>
                                 </td>
                                 <td className="wd-login-id">{user.loginId}</td>
@@ -97,3 +96,4 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: { use
         </div>
     );
 }
+
