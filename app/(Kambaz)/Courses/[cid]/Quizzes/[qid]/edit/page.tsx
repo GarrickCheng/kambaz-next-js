@@ -5,6 +5,22 @@ import { Button, Form, Nav, Tab } from "react-bootstrap";
 import * as quizzesClient from "../../client";
 import QuizQuestionsEditor from "./QuizQuestionsEditor";
 
+interface Choice {
+  text: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  _id: string;
+  type: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "FILL_IN_BLANK";
+  title: string;
+  points: number;
+  question: string;
+  choices?: Choice[];
+  correctAnswer?: boolean;
+  possibleAnswers?: string[];
+}
+
 interface Quiz {
   _id: string;
   title: string;
@@ -26,13 +42,7 @@ interface Quiz {
   availableDate?: string;
   untilDate?: string;
   published: boolean;
-  questions: Array<{
-    _id: string;
-    type: string;
-    title: string;
-    points: number;
-    question: string;
-  }>;
+  questions: Question[];
   [key: string]: unknown;
 }
 
